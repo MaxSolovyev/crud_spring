@@ -11,6 +11,6 @@
     <title>Title</title>
 </head>
 <body>
-    Hello, dear stranger!
+    Hello, this is start page!
 </body>
 </html>

@@ -1,4 +1,5 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="security" uri="http://www.springframework.org/security/tags" %>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
          pageEncoding="UTF-8"
 %>
@@ -13,7 +14,17 @@
 </head>
 <body>
 
-<p>Welcome, ${userAuth.name}</p>
+<p>
+    <security:authorize access="isAuthenticated()">
+    Welcome, <security:authentication property="principal.username" />
+    </security:authorize>
+</p>
+
+<div class="controls">
+    <p>
+        <a href="<c:url value="/logout" />">Logout</a>
+    </p>
+</div>
 
 <div class="controls">
     <form action='/admin/register'>

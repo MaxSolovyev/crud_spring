@@ -82,40 +82,45 @@ public class UserController {
         return new User();
     }
 
-    @PostMapping("/login")
-    public String Login(@RequestParam("login") String login,
-                               @RequestParam("password") String password,
-                               Model model) {
-
-        User user = userService.getByLogin(login);
-        String destination = "redirect:/login";
-        if (user!=null) {
-            if (password.equals(user.getPassword())) {
-                if ("admin".equals(user.getRole())) {
-                    destination = "redirect:/admin";
-                } else {
-                    destination = "redirect:/main";
-                }
-            } else {
-                user = null;
-            }
-        }
-        model.addAttribute("userAuth",user);
-
-        return destination;
-    }
+//    @PostMapping("/login")
+//    public String Login(@RequestParam("login") String login,
+//                               @RequestParam("password") String password,
+//                               Model model) {
+//
+//        User user = userService.getByLogin(login);
+//        String destination = "redirect:/login";
+//        if (user!=null) {
+//            if (password.equals(user.getPassword())) {
+//                if ("admin".equals(user.getRole())) {
+//                    destination = "redirect:/admin";
+//                } else {
+//                    destination = "redirect:/main";
+//                }
+//            } else {
+//                user = null;
+//            }
+//        }
+//        model.addAttribute("userAuth",user);
+//
+//        return destination;
+//    }
 
     @GetMapping("/error")
     public String errorPage(Model model) {
         return "/error";
     }
 
-    @GetMapping("/default")
-    public String redirectDefault(HttpServletRequest request) {
-        if (request.isUserInRole("admin")) {
-            return "redirect: /admin";
-        }
-        return "redirect: /main";
+    @GetMapping("/accessDenied")
+    public String accessDeniedPage(Model model) {
+        return "/accessDenied";
     }
+
+//    @GetMapping("/default")
+//    public String redirectDefault(HttpServletRequest request) {
+//        if (request.isUserInRole("admin")) {
+//            return "redirect: /admin";
+//        }
+//        return "redirect: /main";
+//    }
 
 }
