@@ -1,4 +1,5 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
          pageEncoding="UTF-8"
 %>
@@ -53,7 +54,17 @@
             <!-- Password-->
             <label class="control-label" for="role">role</label>
             <div class="controls">
-                <input type="text" id="role" name="role" value="${user.role}" placeholder="" class="input-xlarge">
+
+                <c:if test="${fn:length(user.roles) > 0}">
+                    <c:forEach var="role" items="${user.roles}" varStatus="loopCount">
+                        <c:if test="${loopCount.count eq 1}">
+                            <c:set var = "roleName" value="${role.name}"></c:set>
+                            <%--attachment.id--%>
+                        </c:if>
+                    </c:forEach>
+                </c:if>
+
+                <input type="text" id="role" name="role" value="${roleName}" placeholder="" class="input-xlarge">
             </div>
         </div>
 

@@ -1,4 +1,4 @@
-package com.crud.service;
+package com.crud.security.service;
 
 import com.crud.service.abstraction.UserService;
 import com.crud.model.User;
@@ -19,18 +19,24 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String login) throws UsernameNotFoundException {
         User user = userService.getByLogin(login);
-
-        UserBuilder builder = null;
         if (user != null) {
-            String[] roles = {user.getRole()};
-            builder = org.springframework.security.core.userdetails.User.withUsername(user.getLogin());
-            builder.password(new BCryptPasswordEncoder().encode(user.getPassword()));
-            builder.roles(roles);
+            user.setPassword(new BCryptPasswordEncoder().encode(user.getPassword()));
         } else {
-            throw new UsernameNotFoundException("User not found.");
+            throw new UsernameNotFoundException("Invalid username");
         }
 
-        return builder.build();
+//        UserBuilder builder = null;
+//        if (user != null) {
+//            String[] roles = {user.getRole()};
+//            builder = org.springframework.security.core.userdetails.User.withUsername(user.getLogin());
+//            builder.password(new BCryptPasswordEncoder().encode(user.getPassword()));
+//            builder.roles(roles);
+//        } else {
+//            throw new UsernameNotFoundException("User not found.");
+//        }
+
+//        return builder.build();
+        return user;
     }
 
 }

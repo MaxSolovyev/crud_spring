@@ -1,5 +1,7 @@
 package com.crud.controller;
 
+import com.crud.model.Role;
+import com.crud.service.abstraction.RoleService;
 import com.crud.service.abstraction.UserService;
 import com.crud.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +10,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.HashSet;
+import java.util.Set;
 
 @Controller
 @SessionAttributes("userAuth")
@@ -15,6 +19,9 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private RoleService roleService;
 
     @GetMapping("/")
     public String view() {
@@ -40,7 +47,13 @@ public class UserController {
     }
 
     @PostMapping("admin/register")
-    public String AddUser(@ModelAttribute User user) {
+    public String AddUser(@ModelAttribute User user,
+                        @RequestParam(value = "role") String roleName) {
+
+        Role role = roleService.getByName(roleName);
+        Set<Role> roles = new HashSet<>();
+        roles.add(role);
+        user.setRoles(roles);
         userService.save(user);
 
         return "redirect:/admin";
@@ -54,7 +67,13 @@ public class UserController {
     }
 
     @PostMapping("/admin/edit")
-    public String EditUser(@ModelAttribute User user) {
+    public String EditUser(@ModelAttribute User user,
+                           @RequestParam(value = "role") String roleName) {
+        Role role = roleService.getByName(roleName);
+        Set<Role> roles = new HashSet<>();
+        roles.add(role);
+        user.setRoles(roles);
+
         userService.update(user);
 
         return "redirect:/admin";
@@ -104,11 +123,6 @@ public class UserController {
 //
 //        return destination;
 //    }
-
-    @GetMapping("/error")
-    public String errorPage(Model model) {
-        return "/error";
-    }
 
     @GetMapping("/accessDenied")
     public String accessDeniedPage(Model model) {

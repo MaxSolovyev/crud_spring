@@ -1,11 +1,15 @@
 package com.crud.model;
 
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
 import javax.persistence.*;
-import java.util.Objects;
+import java.util.*;
 
 @Entity
 @Table(name = "user")
-public class User {
+public class User implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -13,9 +17,20 @@ public class User {
     private String name;
     private String login;
     private String password;
-    private String role;
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "user_role",
+            joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id")
+    )
+    private Set<Role> roles = new HashSet<>();
 
     public User() {
+    }
+
+    public void setRoles(Set<Role> roles) {
+        this.roles = roles;
     }
 
     public User(long id) {
@@ -26,7 +41,7 @@ public class User {
         this.name = name;
         this.login = login;
         this.password = password;
-        this.role = role;
+//        this.role = role;
     }
 
     public User(long id, String name, String login, String password, String role) {
@@ -34,7 +49,7 @@ public class User {
         this.name = name;
         this.login = login;
         this.password = password;
-        this.role = role;
+//        this.role = role;
     }
 
     public void setId(long id) {
@@ -53,8 +68,48 @@ public class User {
         return login;
     }
 
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        List<GrantedAuthority> authorities = new ArrayList<>();
+        for(Role role : roles) {
+            GrantedAuthority authority = new SimpleGrantedAuthority(role.getAuthority());
+            authorities.add(authority);
+        }
+
+        return authorities;
+    }
+
     public String getPassword() {
         return password;
+    }
+
+    public Set<Role> getRoles() {
+        return roles;
+    }
+
+    @Override
+    public String getUsername() {
+        return login;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
     }
 
     public void setName(String name) {
@@ -69,13 +124,13 @@ public class User {
         this.password = password;
     }
 
-    public String getRole() {
-        return role;
-    }
-
-    public void setRole(String role) {
-        this.role = role;
-    }
+//    public String getRole() {
+//        return role;
+//    }
+//
+//    public void setRole(String role) {
+//        this.role = role;
+//    }
 
     @Override
     public String toString() {
@@ -102,5 +157,14 @@ public class User {
     public int hashCode() {
 
         return Objects.hash(id, name, login, password);
+    }
+
+    public String rolesToString() {
+        StringBuilder rolesStringBuilder = null;
+        for(Role role : roles) {
+            rolesStringBuilder.append(role.getName());
+            rolesStringBuilder.append(", ");
+        }
+        return rolesStringBuilder.toString();
     }
 }

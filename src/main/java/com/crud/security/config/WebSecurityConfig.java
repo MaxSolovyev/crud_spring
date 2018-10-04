@@ -1,18 +1,17 @@
-package com.crud.config;
+package com.crud.security.config;
 
-import com.crud.service.UserDetailsServiceImpl;
+import com.crud.security.service.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 
 //@Configuration
 @EnableWebSecurity
@@ -30,6 +29,18 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     public AuthenticationSuccessHandler myAuthenticationSuccessHandler(){
         return new MySimpleUrlAuthenticationSuccessHandler();
     }
+
+    @Bean
+    public AuthenticationFailureHandler myAuthenticationFailureHandler(){
+        return new MySimpleUrlAuthenticationFailureHandler();
+    }
+
+    @Bean
+    public LogoutSuccessHandler myLogoutSuccessHandler(){
+        return new MySimpleLogoutSuccessHandler();
+    }
+
+
 
     @Autowired
     private UserDetailsServiceImpl userDetailsService;
@@ -63,16 +74,21 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/admin/**").hasRole("admin")
                 .antMatchers("/main/**").hasAnyRole("admin","user")
                 .and()
+                .authorizeRequests().antMatchers("/login**").permitAll()
+                .and()
                 .formLogin()
                 .loginPage("/login")
                 .loginProcessingUrl("/loginAction")
                 .successHandler(myAuthenticationSuccessHandler())
                 .permitAll()
-                .failureUrl("/error")
+                .failureHandler(myAuthenticationFailureHandler())
                 .permitAll()
+//                .failureUrl("/error")
+//                .permitAll()
 //                .defaultSuccessUrl("/default",true)
                 .and()
-                .logout().permitAll().logoutSuccessUrl("/login")
+                .logout().logoutSuccessHandler(myLogoutSuccessHandler()).permitAll()
+//                .logoutSuccessUrl("/login")
                 .and()
                 .exceptionHandling().accessDeniedPage("/accessDenied");
     }

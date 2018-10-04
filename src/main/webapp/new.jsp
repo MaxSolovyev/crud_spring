@@ -45,7 +45,7 @@
             <!-- Password-->
             <label class="control-label" for="role">role</label>
             <div class="controls">
-                <input type="text" id="role" name="role" value="${user.role}" placeholder="" class="input-xlarge">
+                <input type="text" id="role" name="role" value="" placeholder="" class="input-xlarge">
             </div>
         </div>
 

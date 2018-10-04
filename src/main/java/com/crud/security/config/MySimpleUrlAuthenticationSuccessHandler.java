@@ -1,9 +1,10 @@
-package com.crud.config;
+package com.crud.security.config;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.web.DefaultRedirectStrategy;
 import org.springframework.security.web.RedirectStrategy;
 import org.springframework.security.web.WebAttributes;
@@ -39,27 +40,40 @@ public class MySimpleUrlAuthenticationSuccessHandler
     }
 
     protected String determineTargetUrl(Authentication authentication) {
-        boolean isUser = false;
-        boolean isAdmin = false;
-        Collection<? extends GrantedAuthority> authorities
-                = authentication.getAuthorities();
-        for (GrantedAuthority grantedAuthority : authorities) {
-            if (grantedAuthority.getAuthority().equals("ROLE_user")) {
-                isUser = true;
-                break;
-            } else if (grantedAuthority.getAuthority().equals("ROLE_admin")) {
-                isAdmin = true;
-                break;
-            }
-        }
+        GrantedAuthority roleAdmin = new SimpleGrantedAuthority("ROLE_admin");
+        GrantedAuthority roleUser = new SimpleGrantedAuthority("ROLE_user");
 
-        if (isUser) {
-            return "/main";
-        } else if (isAdmin) {
+        Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
+        if (authorities.contains(roleAdmin)) {
             return "/admin";
+        } else if (authorities.contains(roleUser)) {
+            return "/main";
         } else {
             throw new IllegalStateException();
         }
+
+
+//        boolean isUser = false;
+//        boolean isAdmin = false;
+//        Collection<? extends GrantedAuthority> authorities
+//                = authentication.getAuthorities();
+//        for (GrantedAuthority grantedAuthority : authorities) {
+//            if (grantedAuthority.getAuthority().equals("ROLE_user")) {
+//                isUser = true;
+//                break;
+//            } else if (grantedAuthority.getAuthority().equals("ROLE_admin")) {
+//                isAdmin = true;
+//                break;
+//            }
+//        }
+//
+//        if (isUser) {
+//            return "/main";
+//        } else if (isAdmin) {
+//            return "/admin";
+//        } else {
+//            throw new IllegalStateException();
+//        }
     }
 
     protected void clearAuthenticationAttributes(HttpServletRequest request) {
